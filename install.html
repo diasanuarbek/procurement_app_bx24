@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Установка приложения Заявки на закуп</title>
+    <script src="//api.bitrix24.com/api/v1/"></script>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 30px; text-align: center;">
+    <h2>Установка приложения «Заявки на закупку»...</h2>
+    <p id="status">Завершение регистрации в Битрикс24...</p>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof BX24 !== "undefined") {
+                BX24.init(function() {
+                    BX24.installFinish();
+                    document.getElementById("status").innerHTML = "✓ Приложение успешно установлено! Перенаправление...";
+                    setTimeout(function() {
+                        window.location.href = "index.html";
+                    }, 1500);
+                });
+            } else {
+                document.getElementById("status").innerHTML = "Приложение готово к работе. <a href='index.html'>Перейти к созданию заявок</a>";
+            }
+        });
+    </script>
+</body>
+</html>

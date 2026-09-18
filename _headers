@@ -1,0 +1,4 @@
+﻿/*
+  Access-Control-Allow-Origin: *
+  Content-Security-Policy: frame-ancestors https://b24.alageum.com https://*.alageum.com https://*.bitrix24.kz https://*.bitrix24.com *
+  X-Frame-Options: ALLOWALL

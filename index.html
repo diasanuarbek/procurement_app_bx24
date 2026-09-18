@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявки на закупку — Отдел закупа Битрикс24</title>
+    <!-- Официальный JS SDK Битрикс24 -->
+    <script src="https://api.bitrix24.com/api/v1/"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <!-- Шапка приложения -->
+    <header class="app-header">
+        <div class="header-left">
+            <img src="logo.png" alt="Alageum Electric" class="app-logo">
+            <div class="header-divider"></div>
+            <div class="header-title">
+                <h1>Создание заявок на закупку</h1>
+                <div class="header-subtitle">Автоматическое создание элементов в смарт-процессе отдела закупа</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Блок обоснования закупки -->
+    <section class="card">
+        <div class="card-title">📝 Обоснование покупки</div>
+        <div class="form-group">
+            <input type="text" id="common-justification" class="form-control" placeholder="Укажите обоснование или назначение закупки...">
+            <div class="quick-tags">
+                <span class="quick-tag-label">Быстрые варианты:</span>
+                <button type="button" class="quick-tag" data-tag="Пополнение склада">Пополнение склада</button>
+                <button type="button" class="quick-tag" data-tag="Для проекта">Для проекта</button>
+                <button type="button" class="quick-tag" data-tag="Замена вышедшего из строя">Замена вышедшего из строя</button>
+                <button type="button" class="quick-tag" data-tag="Расходные материалы">Расходные материалы</button>
+                <button type="button" class="quick-tag" data-tag="Канцтовары / Офис">Канцтовары / Офис</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Таблица позиций товаров -->
+    <section class="card">
+        <div class="table-toolbar">
+            <div class="toolbar-actions">
+                <button type="button" class="btn btn-primary" id="btn-add-row">
+                    ➕ Добавить позицию
+                </button>
+                <button type="button" class="btn btn-light" id="btn-paste-excel">
+                    📋 Вставить из Excel
+                </button>
+                <button type="button" class="btn btn-light btn-danger" id="btn-clear-all">
+                    🗑 Очистить все
+                </button>
+            </div>
+            <div class="table-stats">
+                Подсказка: на <strong>каждую строку</strong> создается <strong>отдельная заявка</strong> в смарт-процессе
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th class="col-idx">№</th>
+                        <th class="col-name">Наименование товара <span style="color:red">*</span></th>
+                        <th class="col-unit">Ед. изм.</th>
+                        <th class="col-qty">Количество <span style="color:red">*</span></th>
+                        <th class="col-files">Файлы / Спецификация</th>
+                        <th class="col-note">Примечание / Ссылка</th>
+                        <th class="col-actions"></th>
+                    </tr>
+                </thead>
+                <tbody id="items-table-body">
+                    <!-- Динамические строки добавляются через app.js -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Нижняя плашка подтверждения и отправки -->
+    <div class="submit-bar">
+        <div class="submit-info">
+            <div>Готово к отправке: <strong id="total-rows-count">0</strong> поз.</div>
+            <div class="submit-subinfo">На каждую позицию создается отдельная заявка в смарт-процессе</div>
+        </div>
+        <button type="button" class="btn btn-primary btn-large btn-submit-styled" id="btn-submit-requests" disabled>
+            🚀 Отправить заявки в закуп (0 шт.)
+        </button>
+    </div>
+</div>
+
+<!-- Модальное окно быстрой вставки из Excel -->
+<div class="modal-overlay" id="modal-paste">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3>📋 Быстрая вставка из Excel или Таблиц</h3>
+            <button type="button" class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-info">
+                Скопируйте строки в Excel и вставьте в поле ниже. Колонки: <strong>Наименование | Единица измерения | Количество | Примечание</strong>.
+            </div>
+            <div class="form-group">
+                <textarea id="paste-textarea" class="form-control" rows="8" placeholder="Бумага А4 SvetoCopy&#9;штук&#9;5&#9;Белая для принтера&#10;Кабель витая пара UTP&#9;метр&#9;150&#9;Категория 5e&#10;Скотч упаковочный&#9;штук&#9;10&#9;"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light modal-cancel">Отмена</button>
+            <button type="button" class="btn btn-primary" id="btn-apply-paste">Добавить в таблицу</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно прогресса и результатов создания -->
+<div class="modal-overlay" id="modal-progress">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3>Создание заявок в смарт-процессе отдела закупа</h3>
+            <button type="button" class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="progress-container">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-bar-fill"></div>
+                </div>
+                <div class="progress-label">
+                    <span id="progress-label-text">Отправка данных...</span>
+                </div>
+            </div>
+
+            <div class="results-list" id="progress-results-list">
+                <!-- Сюда динамически добавляются созданные заявки со ссылками -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary modal-cancel" id="btn-progress-done">Готово</button>
+        </div>
+    </div>
+</div>
+
+<script src="config.js"></script>
+<script src="js/bx24-api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
