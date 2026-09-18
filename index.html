@@ -6,7 +6,790 @@
     <title>Заявки на закупку — Отдел закупа Битрикс24</title>
     <!-- Официальный JS SDK Битрикс24 -->
     <script src="https://api.bitrix24.com/api/v1/"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+:root {
+    --company-color: #ae2027;
+    --company-color-hover: #93191f;
+    --company-color-active: #781318;
+    --company-color-light: #fdf5f5;
+    --company-color-border: #f6d2d4;
+
+    --bx-primary: #ae2027;
+    --bx-primary-hover: #93191f;
+    --bx-primary-active: #781318;
+    --bx-success: #28a745;
+    --bx-success-dark: #218838;
+    --bx-danger: #ff5752;
+    --bx-danger-hover: #e0443f;
+    --bx-text-main: #333333;
+    --bx-text-muted: #80868e;
+    --bx-text-dark: #2c3038;
+    --bx-bg-light: #f6f7f9;
+    --bx-bg-white: #ffffff;
+    --bx-border: #edeef0;
+    --bx-border-focus: #ae2027;
+    --bx-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --bx-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --bx-radius: 6px;
+    --bx-radius-lg: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bx-bg-light);
+    color: var(--bx-text-main);
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 16px;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.app-header {
+    background: linear-gradient(135deg, #ae2027 0%, #851218 100%);
+    border-radius: var(--bx-radius-lg);
+    padding: 18px 26px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 6px 20px rgba(174, 32, 39, 0.25);
+    border: none;
+    color: #ffffff;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.app-logo {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+}
+
+.header-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.header-title h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.2px;
+}
+
+.header-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.88);
+    margin-top: 3px;
+}
+
+.header-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.badge-applicant {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 8px 18px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.badge-applicant strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.badge-applicant .dot-online {
+    width: 9px;
+    height: 9px;
+    background: #4cd964;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(76, 217, 100, 0.45);
+}
+
+/* Common Card Styles */
+.card {
+    background: var(--bx-bg-white);
+    border-radius: var(--bx-radius-lg);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--bx-shadow-sm);
+    border: 1px solid var(--bx-border);
+}
+
+.card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--bx-text-dark);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Form fields grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--bx-text-dark);
+}
+
+.form-group label span.req {
+    color: var(--bx-danger);
+}
+
+.form-control {
+    height: 38px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #d3d7dc;
+    border-radius: var(--bx-radius);
+    background-color: #fff;
+    color: var(--bx-text-main);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+}
+
+.form-control:focus {
+    border-color: var(--bx-border-focus);
+    box-shadow: 0 0 0 2px rgba(47, 198, 246, 0.2);
+}
+
+.field-readonly {
+    height: 38px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #e2e5e9;
+    border-radius: var(--bx-radius);
+    background-color: #f7f9fa;
+    color: var(--bx-text-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+textarea.form-control {
+    height: auto;
+    resize: vertical;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--bx-radius);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+    user-select: none;
+}
+
+.btn-primary {
+    background-color: var(--bx-primary);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: var(--bx-primary-hover);
+}
+
+.btn-success {
+    background-color: var(--bx-success);
+    color: #fff;
+}
+
+.btn-success:hover {
+    background-color: var(--bx-success-dark);
+}
+
+.btn-danger {
+    background-color: #fff;
+    color: var(--bx-danger);
+    border-color: #ffd0cf;
+}
+
+.btn-danger:hover {
+    background-color: #ffeae9;
+}
+
+.btn-light {
+    background-color: #f8f9fa;
+    color: var(--bx-text-dark);
+    border-color: #d8dce1;
+}
+
+.btn-light:hover {
+    background-color: #ebeef2;
+}
+
+.btn-sm {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-large {
+    height: 46px;
+    padding: 0 26px;
+    font-size: 15px;
+}
+
+/* Table Toolbar */
+.table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.table-stats {
+    font-size: 13px;
+    color: var(--bx-text-muted);
+}
+
+.table-stats strong {
+    color: var(--bx-text-dark);
+}
+
+/* Table */
+.table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--bx-border);
+    border-radius: var(--bx-radius);
+    background: white;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.items-table th {
+    background: #f8f9fb;
+    padding: 12px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--bx-text-muted);
+    border-bottom: 1px solid var(--bx-border);
+    white-space: nowrap;
+}
+
+.items-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--bx-border);
+    vertical-align: middle;
+}
+
+.items-table tbody tr:hover {
+    background-color: #fafbfc;
+}
+
+.items-table .col-idx {
+    width: 44px;
+    text-align: center;
+    color: var(--bx-text-muted);
+    font-weight: 500;
+}
+
+.items-table .col-name {
+    min-width: 280px;
+}
+
+.items-table .col-unit {
+    width: 140px;
+}
+
+.items-table .col-qty {
+    width: 120px;
+}
+
+.items-table .col-files {
+    min-width: 170px;
+    max-width: 240px;
+}
+
+.file-upload-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.btn-attach {
+    cursor: pointer;
+    background: #f8f9fa;
+    border: 1px dashed #b5bcc5;
+    color: var(--bx-text-dark);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+    user-select: none;
+    width: fit-content;
+}
+
+.btn-attach:hover {
+    background: #eef6fc;
+    border-color: var(--bx-primary);
+    color: var(--bx-primary);
+}
+
+.row-files-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-height: 80px;
+    overflow-y: auto;
+}
+
+.file-tag {
+    background: #e8f4fc;
+    border: 1px solid #c8e4f8;
+    color: #1a6da0;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-tag-remove {
+    cursor: pointer;
+    font-weight: bold;
+    color: #888;
+    margin-left: 2px;
+}
+
+.file-tag-remove:hover {
+    color: var(--bx-danger);
+}
+
+.items-table .col-actions {
+    width: 70px;
+    text-align: center;
+}
+
+.items-table input.form-control,
+.items-table select.form-control {
+    height: 34px;
+    font-size: 13px;
+    padding: 6px 10px;
+}
+
+/* Row Action Buttons */
+.row-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+.btn-row-del {
+    color: #999;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-row-del:hover {
+    color: var(--bx-danger);
+    background-color: #ffeeee;
+}
+
+.btn-row-copy {
+    color: #999;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-row-copy:hover {
+    color: var(--company-color);
+    background-color: var(--company-color-light);
+}
+
+/* Bottom submit bar */
+.submit-bar {
+    background: white;
+    border: 1px solid var(--bx-border);
+    border-radius: var(--bx-radius-lg);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--bx-shadow-sm);
+    position: sticky;
+    bottom: 16px;
+    z-index: 10;
+}
+
+.submit-info {
+    font-size: 14px;
+    color: var(--bx-text-dark);
+}
+
+.submit-info strong {
+    color: var(--bx-primary-hover);
+    font-size: 16px;
+}
+
+.submit-subinfo {
+    font-size: 12px;
+    color: var(--bx-text-muted);
+    margin-top: 3px;
+}
+
+.btn-submit-styled {
+    background: linear-gradient(135deg, #ae2027 0%, #851218 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(174, 32, 39, 0.35);
+    transition: all 0.18s ease-in-out;
+}
+
+.btn-submit-styled:hover:not(:disabled) {
+    background: linear-gradient(135deg, #be262e 0%, #95141b 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(174, 32, 39, 0.45);
+}
+
+.btn-submit-styled:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(174, 32, 39, 0.3);
+}
+
+.btn-submit-styled:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+    background: #a0a5ad !important;
+}
+
+/* Quick justification tags */
+.quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.quick-tag-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--bx-text-muted);
+}
+
+.quick-tag {
+    background: #f1f3f5;
+    border: 1px solid #e2e5e8;
+    color: #495057;
+    font-size: 12px;
+    padding: 3px 11px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    user-select: none;
+}
+
+.quick-tag:hover {
+    background: var(--company-color-light);
+    border-color: var(--company-color-border);
+    color: var(--company-color);
+    transform: translateY(-1px);
+}
+
+.quick-tag:active {
+    transform: translateY(0);
+}
+
+/* Drag and drop highlight */
+.file-upload-wrapper.dragover {
+    border-color: var(--company-color);
+    background-color: var(--company-color-light);
+    border-radius: 4px;
+}
+
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease-in-out;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-dialog {
+    background: #fff;
+    border-radius: var(--bx-radius-lg);
+    max-width: 650px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--bx-shadow-md);
+    transform: translateY(-20px);
+    transition: transform 0.25s ease-in-out;
+}
+
+.modal-overlay.active .modal-dialog {
+    transform: translateY(0);
+}
+
+.modal-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--bx-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--bx-text-dark);
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    color: var(--bx-text-muted);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--bx-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #fafbfc;
+    border-radius: 0 0 var(--bx-radius-lg) var(--bx-radius-lg);
+}
+
+/* Progress bar */
+.progress-container {
+    margin: 20px 0;
+}
+
+.progress-track {
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ae2027, #e0444c);
+    width: 0%;
+    transition: width 0.2s ease-in-out;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--bx-text-muted);
+    margin-top: 6px;
+}
+
+/* Result Items List in Modal */
+.results-list {
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid var(--bx-border);
+    border-radius: var(--bx-radius);
+    margin-top: 14px;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 13px;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-item.success {
+    background-color: #f7fdf4;
+}
+
+.result-item.error {
+    background-color: #fff6f6;
+}
+
+.result-link {
+    color: var(--bx-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.result-link:hover {
+    text-decoration: underline;
+}
+
+.badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: #e5f7d8;
+    color: #4b8918;
+}
+
+.badge-error {
+    background-color: #ffe6e5;
+    color: #cf221c;
+}
+
+/* Notice box */
+.alert {
+    padding: 12px 16px;
+    border-radius: var(--bx-radius);
+    margin-bottom: 16px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.alert-info {
+    background-color: #e8f4fd;
+    border: 1px solid #c2e2f9;
+    color: #17659e;
+}
+
+.alert-warning {
+    background-color: #fff9e6;
+    border: 1px solid #ffe899;
+    color: #8a6d1a;
+}
+
+</style>
 </head>
 <body>
 
@@ -14,7 +797,7 @@
     <!-- Шапка приложения -->
     <header class="app-header">
         <div class="header-left">
-            <img src="logo.png" alt="Alageum Electric" class="app-logo">
+            <img src="data:image/png;base64,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" alt="Alageum Electric" class="app-logo">
             <div class="header-divider"></div>
             <div class="header-title">
                 <h1>Создание заявок на закупку</h1>
@@ -139,8 +922,1368 @@
     </div>
 </div>
 
-<script src="config.js"></script>
-<script src="js/bx24-api.js"></script>
-<script src="js/app.js"></script>
+<script>
+/**
+ * Конфигурация приложения для заявок на закуп
+ * Основной коробочный Битрикс24: b24.alageum.com
+ * Смарт-процесс: 1180 (воронка 85)
+ */
+const APP_CONFIG = {
+    // Домен основного коробочного портала Битрикс24
+    portalDomain: "b24.alageum.com",
+
+    // Идентификатор смарт-процесса отдела закупа (entityTypeId)
+    // https://b24.alageum.com/crm/type/1180/automation/85/ -> 1180
+    entityTypeId: 1180,
+
+    // Категория / воронка (85)
+    categoryId: 85,
+
+    // Сопоставление полей смарт-процесса на коробке
+    fields: {
+        // Стандартное системное название карточки (TITLE)
+        title: "TITLE",
+        
+        // Наименование товара - UF_CRM_53_PRODUCT_NAME (строка)
+        productName: "UF_CRM_53_PRODUCT_NAME",
+        
+        // Количество - UF_CRM_53_QUANTITY (число)
+        quantity: "UF_CRM_53_QUANTITY",
+        
+        // Единица измерения - UF_CRM_53_UNIT (список)
+        unit: "UF_CRM_53_UNIT",
+        
+        // Обоснование покупки - UF_CRM_53_CAUSE (строка/текст)
+        cause: "UF_CRM_53_CAUSE",
+
+        // Файлы / тех. спецификация - UF_CRM_53_FILES (множественный файл)
+        files: "UF_CRM_53_FILES",
+
+        // Примечание / ссылка - UF_CRM_53_ADDITIONS (строка/текст)
+        additions: "UF_CRM_53_ADDITIONS",
+
+        // Заявитель (привязка к сотруднику) - UF_CRM_53_1783939121
+        applicant: "UF_CRM_53_1783939121",
+
+        // Системный комментарий
+        comments: "COMMENTS"
+    },
+
+    // Единицы измерения по умолчанию (автоматически синхронизируются с Битрикс24)
+    defaultUnits: [
+        { id: "штук", value: "штук" },
+        { id: "метр", value: "метр" },
+        { id: "кг", value: "кг" },
+        { id: "км", value: "км" }
+    ],
+
+    // Входящий вебхук коробочного Битрикс24 (b24.alageum.com)
+    // Используется, если приложение открывается по внешней ссылке / автономно.
+    // При размещении внутри Битрикс24 (во фрейме локального приложения) оставьте пустым.
+    webhookUrl: ""
+};
+
+// Функция получения конфигурации
+function loadAppConfig() {
+    return APP_CONFIG;
+}
+
+</script>
+<script>
+/**
+ * Модуль интеграции с Bitrix24 REST API
+ * Поддерживает:
+ * 1. Работу внутри фрейма Битрикс24 через официальную библиотеку BX24.js
+ * 2. Работу через входящий вебхук (для удобного тестирования прямо в браузере без установки)
+ */
+
+class Bitrix24Api {
+    constructor(config) {
+        this.config = config || loadAppConfig();
+        this.isBx24 = typeof BX24 !== "undefined";
+        this.unitOptionsMap = new Map(); // Карта "название ед. изм." -> ID в Битриксе
+        this.currentUser = null;
+        this.serverFields = null; // Поля, полученные от crm.item.fields
+        this.resolvedKeys = {
+            title: "title",
+            productName: this.config.fields?.productName || "UF_CRM_53_PRODUCT_NAME",
+            quantity: this.config.fields?.quantity || "UF_CRM_53_QUANTITY",
+            unit: this.config.fields?.unit || "UF_CRM_53_UNIT",
+            cause: this.config.fields?.cause || "UF_CRM_53_CAUSE",
+            files: this.config.fields?.files || "UF_CRM_53_FILES",
+            additions: this.config.fields?.additions || "UF_CRM_53_ADDITIONS",
+            applicant: this.config.fields?.applicant || "UF_CRM_53_1783939121",
+            comments: "COMMENTS"
+        };
+    }
+
+    /**
+     * Запись значения поля во все возможные варианты написания ключей для REST API смарт-процесса
+     */
+    addFieldVariations(targetObj, rawKey, value) {
+        if (!rawKey || value === undefined || value === null) return;
+        targetObj[rawKey] = value;
+        targetObj[rawKey.toUpperCase()] = value;
+        targetObj[rawKey.toLowerCase()] = value;
+
+        // Обработка UF_CRM_XX_...
+        const match = String(rawKey).match(/^UF_CRM_(\d+)_(.+)$/i);
+        if (match) {
+            const num = match[1];
+            const rest = match[2]; // e.g. PRODUCT_NAME
+
+            // ufCrm53_PRODUCT_NAME / ufCrm53_product_name
+            targetObj[`ufCrm${num}_${rest}`] = value;
+            targetObj[`ufCrm${num}_${rest.toLowerCase()}`] = value;
+
+            // ufCrm_53_PRODUCT_NAME / ufCrm_53_product_name
+            targetObj[`ufCrm_${num}_${rest}`] = value;
+            targetObj[`ufCrm_${num}_${rest.toLowerCase()}`] = value;
+
+            // camelCase: ufCrm53ProductName
+            const camelRest = rest.toLowerCase().replace(/_([a-z])/g, (_, g) => g.toUpperCase());
+            const capitalizedCamelRest = camelRest.charAt(0).toUpperCase() + camelRest.slice(1);
+            targetObj[`ufCrm${num}${capitalizedCamelRest}`] = value;
+            targetObj[`ufCrm_${num}${capitalizedCamelRest}`] = value;
+        }
+    }
+
+    /**
+     * Инициализация API
+     */
+    async init() {
+        return new Promise((resolve) => {
+            let finished = false;
+            const finish = () => {
+                if (!finished) {
+                    finished = true;
+                    resolve(true);
+                }
+            };
+
+            // Защитный таймаут (1.5 сек): если открыто вне Битрикса или BX24.init не отвечает,
+            // не блокируем работу приложения и пробуем вебхук/демо
+            const timeoutId = setTimeout(async () => {
+                console.warn("Таймаут ожидания BX24.init. Переключение в автономный/вебхук режим.");
+                try {
+                    await this.getCurrentUser();
+                    await this.loadSmartProcessMetadata();
+                } catch (e) {}
+                finish();
+            }, 1500);
+
+            if (this.isBx24 && typeof BX24 !== "undefined" && BX24.init) {
+                try {
+                    BX24.init(async () => {
+                        clearTimeout(timeoutId);
+                        console.log("BX24 JS SDK успешно инициализирован");
+                        try {
+                            BX24.fitWindow();
+                        } catch (e) {}
+                        try {
+                            await this.getCurrentUser();
+                            await this.loadSmartProcessMetadata();
+                        } catch (e) {
+                            console.warn("Ошибка при получении данных в BX24.init:", e);
+                        }
+                        finish();
+                    });
+                } catch (err) {
+                    clearTimeout(timeoutId);
+                    console.warn("Ошибка вызова BX24.init:", err);
+                    finish();
+                }
+            } else {
+                clearTimeout(timeoutId);
+                console.log("Режим работы без фрейма BX24 (вебхук или автономно)");
+                Promise.all([this.getCurrentUser(), this.loadSmartProcessMetadata()]).finally(finish);
+            }
+        });
+    }
+
+    /**
+     * Получение текущего пользователя (заявителя) с гарантированным определением ФИО
+     */
+    async getCurrentUser() {
+        if (this.currentUser && this.currentUser.fullName) {
+            return this.currentUser;
+        }
+
+        let user = null;
+
+        // 1. Пробуем получить через user.current
+        try {
+            const res = await this.callMethod("user.current", {});
+            const data = (res && res.result) ? res.result : res;
+            if (data && (data.NAME || data.LAST_NAME || data.ID)) {
+                user = data;
+            }
+        } catch (e) {
+            console.warn("user.current не вернул пользователя (возможно, нет прав 'user' или вебхук):", e.message);
+        }
+
+        // 2. Если user.current не вернул ФИО, ищем ID в окружении и запрашиваем через user.get
+        if (!user || (!user.NAME && !user.LAST_NAME)) {
+            try {
+                let targetUserId = null;
+
+                // Проверяем параметры URL (?USER_ID=... или ?user_id=...)
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    targetUserId = urlParams.get("USER_ID") || urlParams.get("user_id") || urlParams.get("userId");
+                } catch (e) {}
+
+                // Если во фрейме BX24
+                if (!targetUserId && this.isBx24 && typeof BX24 !== "undefined" && BX24.getAuth) {
+                    const auth = BX24.getAuth();
+                    if (auth && (auth.user_id || auth.USER_ID)) {
+                        targetUserId = auth.user_id || auth.USER_ID;
+                    }
+                }
+
+                // Если через вебхук - парсим ID пользователя из URL вебхука (/rest/1/xxxx/)
+                if (!targetUserId && this.config.webhookUrl) {
+                    const match = this.config.webhookUrl.match(/\/rest\/(\d+)\//);
+                    if (match && match[1]) {
+                        targetUserId = match[1];
+                    }
+                }
+
+                if (targetUserId) {
+                    const res = await this.callMethod("user.get", { ID: targetUserId });
+                    const list = (res && res.result) ? res.result : (Array.isArray(res) ? res : [res]);
+                    if (Array.isArray(list) && list.length > 0 && list[0]) {
+                        user = list[0];
+                    }
+                }
+            } catch (e2) {
+                console.warn("user.get также не вернул данные:", e2.message);
+            }
+        }
+
+        if (user) {
+            // Формируем красивое ФИО (Фамилия Имя Отчество)
+            const parts = [user.LAST_NAME, user.NAME, user.SECOND_NAME].filter(Boolean);
+            if (parts.length === 0 && user.NAME) parts.push(user.NAME);
+
+            user.fullName = parts.length > 0 
+                ? parts.join(" ") 
+                : (user.EMAIL ? user.EMAIL : `Сотрудник ID ${user.ID}`);
+
+            this.currentUser = user;
+            console.log("Успешно определен заявитель (ФИО):", user.fullName, user);
+            return this.currentUser;
+        }
+
+        return null;
+    }
+
+    /**
+     * Проверка доступности подключения
+     */
+    async testConnection() {
+        try {
+            const res = await this.callMethod("user.current", {});
+            return {
+                success: true,
+                user: res.result || res
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message || "Ошибка подключения к Битрикс24"
+            };
+        }
+    }
+
+    /**
+     * Загрузка метаданных полей смарт-процесса и сопоставление реальных названий ключей
+     */
+    async loadSmartProcessMetadata() {
+        try {
+            const fieldsRes = await this.callMethod("crm.item.fields", {
+                entityTypeId: this.config.entityTypeId
+            });
+
+            const fields = fieldsRes.result ? fieldsRes.result.fields : (fieldsRes.fields || {});
+            this.serverFields = fields;
+            console.log("Все поля смарт-процесса из Битрикс24 (crm.item.fields):", fields);
+
+            // Сопоставляем реальные ключи полей в смарт-процессе
+            this.resolvedKeys = {
+                title: this.findRealFieldKey("TITLE", fields) || "title",
+                productName: this.findRealFieldKey(this.config.fields.productName, fields) || this.config.fields.productName,
+                quantity: this.findRealFieldKey(this.config.fields.quantity, fields) || this.config.fields.quantity,
+                unit: this.findRealFieldKey(this.config.fields.unit, fields) || this.config.fields.unit,
+                cause: this.findRealFieldKey(this.config.fields.cause || "UF_CRM_53_CAUSE", fields) || this.config.fields.cause,
+                files: this.findRealFieldKey(this.config.fields.files || "UF_CRM_53_FILES", fields) || this.config.fields.files,
+                additions: this.findRealFieldKey(this.config.fields.additions || "UF_CRM_53_ADDITIONS", fields) || this.config.fields.additions,
+                applicant: this.findRealFieldKey(this.config.fields.applicant || "UF_CRM_53_1783939121", fields) || (this.config.fields.applicant || "UF_CRM_53_1783939121"),
+                comments: this.findRealFieldKey("COMMENTS", fields) || "comments"
+            };
+
+            console.log("Итоговые сопоставленные ключи полей:", this.resolvedKeys);
+
+            // Ищем поле единиц измерения для загрузки вариантов списка
+            const unitKey = this.resolvedKeys.unit;
+            const unitField = fields[unitKey] || fields[this.config.fields.unit];
+
+            if (unitField && unitField.items) {
+                this.unitOptionsMap.clear();
+                const loadedUnits = [];
+
+                if (Array.isArray(unitField.items)) {
+                    unitField.items.forEach(item => {
+                        const id = item.ID || item.id;
+                        const val = item.VALUE || item.value || item.NAME || item.name;
+                        if (id && val) {
+                            this.unitOptionsMap.set(String(val).toLowerCase().trim(), id);
+                            loadedUnits.push({ id: id, value: val });
+                        }
+                    });
+                } else if (typeof unitField.items === "object") {
+                    for (const [id, val] of Object.entries(unitField.items)) {
+                        const label = (typeof val === "object") ? (val.VALUE || val.value) : val;
+                        if (id && label) {
+                            this.unitOptionsMap.set(String(label).toLowerCase().trim(), id);
+                            loadedUnits.push({ id: id, value: label });
+                        }
+                    }
+                }
+
+                if (loadedUnits.length > 0) {
+                    console.log("Загружены ID списка единиц измерения из Битрикс24:", loadedUnits);
+                    return loadedUnits;
+                }
+            }
+        } catch (e) {
+            console.warn("Не удалось автоматически прочитать поля через crm.item.fields:", e);
+        }
+
+        return this.config.defaultUnits;
+    }
+
+    /**
+     * Алиас для обратной совместимости
+     */
+    async loadUnitOptions() {
+        return this.loadSmartProcessMetadata();
+    }
+
+    /**
+     * Умный поиск реального названия ключа поля среди полей смарт-процесса
+     */
+    findRealFieldKey(configuredKey, fieldsDict) {
+        if (!fieldsDict || typeof fieldsDict !== "object") return configuredKey;
+        const keys = Object.keys(fieldsDict);
+        if (keys.length === 0) return configuredKey;
+
+        // 1. Точное совпадение
+        if (fieldsDict[configuredKey]) return configuredKey;
+
+        const targetLower = configuredKey.toLowerCase();
+        const targetClean = targetLower.replace(/[^a-z0-9]/g, "");
+
+        // 2. Регистронезависимое совпадение
+        const matchCase = keys.find(k => k.toLowerCase() === targetLower);
+        if (matchCase) return matchCase;
+
+        // 3. Совпадение без спецсимволов и подчеркиваний (например, ufcrm8productname)
+        const matchClean = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, "") === targetClean);
+        if (matchClean) return matchClean;
+
+        // 4. Поиск по смысловой части (PRODUCT_NAME, QUANTITY, UNIT, CAUSE, FILES)
+        if (targetLower.includes("product")) {
+            const m = keys.find(k => k.toLowerCase().includes("product") || k.toLowerCase().includes("tovar"));
+            if (m) return m;
+        }
+        if (targetLower.includes("quant")) {
+            const m = keys.find(k => k.toLowerCase().includes("quant") || k.toLowerCase().includes("kolvo") || k.toLowerCase().includes("qty"));
+            if (m) return m;
+        }
+        if (targetLower.includes("unit")) {
+            const m = keys.find(k => k.toLowerCase().includes("unit") || k.toLowerCase().includes("izm"));
+            if (m) return m;
+        }
+        if (targetLower.includes("cause")) {
+            const m = keys.find(k => k.toLowerCase().includes("cause") || k.toLowerCase().includes("obosn"));
+            if (m) return m;
+        }
+        if (targetLower.includes("file")) {
+            const m = keys.find(k => k.toLowerCase().includes("file") || k.toLowerCase().includes("spec"));
+            if (m) return m;
+        }
+        if (targetLower.includes("addition")) {
+            const m = keys.find(k => k.toLowerCase().includes("addition") || k.toLowerCase().includes("primech") || k.toLowerCase().includes("note"));
+            if (m) return m;
+        }
+
+        // 5. Поиск по заголовку поля (title / formLabel)
+        for (const k of keys) {
+            const f = fieldsDict[k];
+            const title = ((f.title || f.formLabel || f.listLabel || "") + "").toLowerCase();
+            if (targetLower.includes("product") && (title.includes("товар") || title.includes("наименование") || title.includes("продукт"))) {
+                return k;
+            }
+            if (targetLower.includes("quant") && (title.includes("колич") || title.includes("кол-во"))) {
+                return k;
+            }
+            if (targetLower.includes("unit") && (title.includes("единиц") || title.includes("измер"))) {
+                return k;
+            }
+            if (targetLower.includes("cause") && (title.includes("обоснован") || title.includes("причин") || title.includes("цель"))) {
+                return k;
+            }
+            if (targetLower.includes("file") && (title.includes("файл") || title.includes("документ") || title.includes("специфик"))) {
+                return k;
+            }
+            if (targetLower.includes("addition") && (title.includes("примечан") || title.includes("ссылк") || title.includes("дополн"))) {
+                return k;
+            }
+        }
+
+        return configuredKey;
+    }
+
+    /**
+     * Пакетное создание заявок в смарт-процессе
+     * @param {Array} itemsList - массив строк [{ productName, unit, quantity, note, files }]
+     * @param {Object} commonData - общие данные заявки (обоснование, желаемый срок и т.д.)
+     * @param {Function} onProgress - колбэк прогресса (completed, total)
+     */
+    async createProcurementItems(itemsList, commonData = {}, onProgress = null) {
+        if (!itemsList || itemsList.length === 0) {
+            return [];
+        }
+
+        const entityTypeId = this.config.entityTypeId;
+        const total = itemsList.length;
+        let completed = 0;
+        const results = [];
+
+        // Формируем команды для добавления каждого элемента
+        const commands = {};
+
+        // Заявитель (сотрудник, подающий заявку)
+        let applicantId = null;
+        if (commonData.applicantId) {
+            applicantId = commonData.applicantId;
+        } else if (commonData.assignedById) {
+            applicantId = commonData.assignedById;
+        } else if (this.currentUser && this.currentUser.ID) {
+            applicantId = this.currentUser.ID;
+        }
+
+        itemsList.forEach((item, index) => {
+            const cmdKey = `add_item_${index}`;
+
+            // Поиск ID варианта списка (единица измерения)
+            let unitValue = item.unit;
+            const unitLower = (item.unit + "").toLowerCase().trim();
+            if (this.unitOptionsMap.has(unitLower)) {
+                unitValue = this.unitOptionsMap.get(unitLower);
+                console.log(`Ед. изм. "${item.unit}" преобразована в ID списка: ${unitValue}`);
+            }
+
+            // Формируем комментарий / примечание
+            let fullComment = [];
+            if (item.note) fullComment.push(`Примечание к позиции: ${item.note}`);
+
+            // Основные распознанные ключи
+            const pKey = this.resolvedKeys.productName || this.config.fields.productName;
+            const qKey = this.resolvedKeys.quantity || this.config.fields.quantity;
+            const uKey = this.resolvedKeys.unit || this.config.fields.unit;
+            const cKey = this.resolvedKeys.cause || this.config.fields.cause;
+            const fKey = this.resolvedKeys.files || this.config.fields.files;
+            const aKey = this.resolvedKeys.additions || this.config.fields.additions;
+            const appKey = this.resolvedKeys.applicant || this.config.fields.applicant || "UF_CRM_53_1783939121";
+            const tKey = this.resolvedKeys.title || "title";
+            const parsedQty = parseFloat(item.quantity) || 0;
+
+            const fields = {
+                // Системный заголовок элемента смарт-процесса
+                [tKey]: item.productName,
+                title: item.productName,
+                TITLE: item.productName
+            };
+
+            // 1. Товар / наименование
+            this.addFieldVariations(fields, pKey, item.productName);
+            if (this.config.fields.productName) this.addFieldVariations(fields, this.config.fields.productName, item.productName);
+
+            // 2. Количество
+            this.addFieldVariations(fields, qKey, parsedQty);
+            if (this.config.fields.quantity) this.addFieldVariations(fields, this.config.fields.quantity, parsedQty);
+
+            // 3. Единица измерения
+            this.addFieldVariations(fields, uKey, unitValue);
+            if (this.config.fields.unit) this.addFieldVariations(fields, this.config.fields.unit, unitValue);
+
+            // 4. Обоснование покупки
+            if (commonData.justification) {
+                this.addFieldVariations(fields, cKey, commonData.justification);
+                if (this.config.fields.cause) this.addFieldVariations(fields, this.config.fields.cause, commonData.justification);
+            }
+
+            // 5. Примечание / ссылка (UF_CRM_53_ADDITIONS)
+            if (item.note) {
+                if (aKey) this.addFieldVariations(fields, aKey, item.note);
+                if (this.config.fields.additions) this.addFieldVariations(fields, this.config.fields.additions, item.note);
+            }
+
+            // 6. Файлы / тех. спецификация (множественное)
+            if (item.files && item.files.length > 0) {
+                const filesPayload = item.files.map(f => [f.name, f.base64]);
+                this.addFieldVariations(fields, fKey, filesPayload);
+                if (this.config.fields.files) this.addFieldVariations(fields, this.config.fields.files, filesPayload);
+            }
+
+            // Заявитель: записываем в поле UF_CRM_53_1783939121 (привязка к сотруднику), а НЕ в ответственный
+            if (applicantId) {
+                const appKey = this.resolvedKeys.applicant || this.config.fields.applicant || "UF_CRM_53_1783939121";
+                this.addFieldVariations(fields, appKey, applicantId);
+                if (this.config.fields.applicant) {
+                    this.addFieldVariations(fields, this.config.fields.applicant, applicantId);
+                }
+            }
+
+            // Воронка: передаем categoryId если задан в commonData или в config
+            const catId = (commonData.categoryId !== undefined && commonData.categoryId !== null) 
+                ? commonData.categoryId 
+                : this.config.categoryId;
+            if (catId !== null && catId !== undefined && Number(catId) >= 0) {
+                fields.categoryId = Number(catId);
+                fields.CATEGORY_ID = Number(catId);
+            }
+
+            // Комментарии / примечание
+            if (fullComment.length > 0) {
+                const commentText = fullComment.join("\n");
+                fields.comments = commentText;
+                fields.COMMENTS = commentText;
+            }
+
+            commands[cmdKey] = {
+                method: "crm.item.add",
+                params: {
+                    entityTypeId: entityTypeId,
+                    fields: fields
+                }
+            };
+        });
+
+        console.log("Отправка пакета в crm.item.add:", commands);
+
+        // Отправка пакетов (Bitrix24 поддерживает до 50 команд в одном batch-запросе)
+        const cmdKeys = Object.keys(commands);
+        const batchSize = 50;
+
+        for (let i = 0; i < cmdKeys.length; i += batchSize) {
+            const sliceKeys = cmdKeys.slice(i, i + batchSize);
+            const batchChunk = {};
+            sliceKeys.forEach(k => { batchChunk[k] = commands[k]; });
+
+            try {
+                const batchResult = await this.callBatch(batchChunk);
+                console.log("Ответ batch от Битрикс24:", batchResult);
+
+                sliceKeys.forEach((key, sliceIdx) => {
+                    const originalIdx = i + sliceIdx;
+                    const item = itemsList[originalIdx];
+                    const res = batchResult[key];
+
+                    if (res && res.item && res.item.id) {
+                        results.push({
+                            index: originalIdx + 1,
+                            productName: item.productName,
+                            quantity: item.quantity,
+                            unit: item.unit,
+                            success: true,
+                            id: res.item.id,
+                            url: this.getItemUrl(res.item.id)
+                        });
+                    } else if (res && typeof res === "number") {
+                        results.push({
+                            index: originalIdx + 1,
+                            productName: item.productName,
+                            quantity: item.quantity,
+                            unit: item.unit,
+                            success: true,
+                            id: res,
+                            url: this.getItemUrl(res)
+                        });
+                    } else {
+                        const errorMsg = (res && res.error_description) || (res && res.error) || "Неизвестная ошибка";
+                        results.push({
+                            index: originalIdx + 1,
+                            productName: item.productName,
+                            quantity: item.quantity,
+                            unit: item.unit,
+                            success: false,
+                            error: errorMsg
+                        });
+                    }
+
+                    completed++;
+                    if (onProgress) onProgress(completed, total);
+                });
+            } catch (err) {
+                console.error("Ошибка выполнения batch-запроса:", err);
+                sliceKeys.forEach((key, sliceIdx) => {
+                    const originalIdx = i + sliceIdx;
+                    const item = itemsList[originalIdx];
+                    results.push({
+                        index: originalIdx + 1,
+                        productName: item.productName,
+                        quantity: item.quantity,
+                        unit: item.unit,
+                        success: false,
+                        error: err.message || "Ошибка отправки пакета"
+                    });
+                    completed++;
+                    if (onProgress) onProgress(completed, total);
+                });
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Ссылка на карточку созданного элемента смарт-процесса в Битрикс24
+     */
+    getItemUrl(itemId) {
+        const domain = this.config.portalDomain || "b24.alageum.com";
+        return `https://${domain}/crm/type/${this.config.entityTypeId}/details/${itemId}/`;
+    }
+
+    /**
+     * Универсальный вызов метода REST API
+     */
+    async callMethod(method, params = {}) {
+        // 1. Если запущено во фрейме Битрикс24
+        if (this.isBx24 && typeof BX24 !== "undefined" && BX24.callMethod) {
+            return new Promise((resolve, reject) => {
+                BX24.callMethod(method, params, (result) => {
+                    if (result.error()) {
+                        reject(new Error(result.error().getError().error_description || result.error().toString()));
+                    } else {
+                        resolve(result.data());
+                    }
+                });
+            });
+        }
+
+        // 2. Если указан входящий вебхук
+        if (this.config.webhookUrl) {
+            let baseUrl = this.config.webhookUrl.trim();
+            if (!baseUrl.endsWith("/")) baseUrl += "/";
+            const url = `${baseUrl}${method}`;
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(params)
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error_description || data.error);
+            }
+            return data;
+        }
+
+        throw new Error("Не настроено подключение к Битрикс24 (отсутствует библиотека BX24 или URL вебхука)");
+    }
+
+    /**
+     * Универсальный вызов Batch
+     */
+    async callBatch(commands) {
+        // 1. Через фрейм BX24
+        if (this.isBx24 && typeof BX24 !== "undefined" && BX24.callBatch) {
+            return new Promise((resolve, reject) => {
+                const formattedCmds = {};
+                for (let k in commands) {
+                    formattedCmds[k] = [commands[k].method, commands[k].params];
+                }
+
+                BX24.callBatch(formattedCmds, (res) => {
+                    const output = {};
+                    for (let k in formattedCmds) {
+                        const r = res[k];
+                        if (r.error()) {
+                            output[k] = { error: r.error().getError().error_description || r.error().toString() };
+                        } else {
+                            output[k] = r.data();
+                        }
+                    }
+                    resolve(output);
+                });
+            });
+        }
+
+        // 2. Через вебхук
+        if (this.config.webhookUrl) {
+            let baseUrl = this.config.webhookUrl.trim();
+            if (!baseUrl.endsWith("/")) baseUrl += "/";
+            const url = `${baseUrl}batch.json`;
+
+            const cmdObj = {};
+            for (let k in commands) {
+                cmdObj[k] = commands[k].method + "?" + this.buildQueryString(commands[k].params);
+            }
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ halt: 0, cmd: cmdObj })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error_description || data.error);
+            }
+            return (data.result && data.result.result) ? data.result.result : {};
+        }
+
+        throw new Error("Не настроено подключение к Битрикс24");
+    }
+
+    /**
+     * Хелпер сериализации параметров в query string
+     */
+    buildQueryString(params, prefix = "") {
+        const query = [];
+        for (const p in params) {
+            if (Object.prototype.hasOwnProperty.call(params, p)) {
+                const k = prefix ? `${prefix}[${p}]` : p;
+                const v = params[p];
+                if (v !== null && typeof v === "object") {
+                    query.push(this.buildQueryString(v, k));
+                } else if (v !== undefined) {
+                    query.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
+                }
+            }
+        }
+        return query.join("&");
+    }
+}
+
+</script>
+<script>
+/**
+ * Главный скрипт приложения "Заявки на закуп в смарт-процесс"
+ * Настройки зафиксированы в config.js.
+ * Поддерживает:
+ * - Ввод позиций закупа
+ * - Прикрепление файлов (тех. спецификаций) к каждой строке [UF_CRM_8_FILES]
+ * - Запись обоснования закупки в [UF_CRM_8_CAUSE]
+ */
+
+let api = null;
+let appConfig = null;
+let availableUnits = [];
+let currentUser = null;
+
+document.addEventListener("DOMContentLoaded", async () => {
+    appConfig = loadAppConfig();
+    api = new Bitrix24Api(appConfig);
+
+    // Инициализация API
+    await api.init();
+
+    // Загрузка пользователя
+    try {
+        currentUser = await api.getCurrentUser();
+    } catch (e) {
+        console.warn("Пользователь не определен:", e);
+    }
+
+    // Загрузка единиц измерения
+    try {
+        availableUnits = await api.loadUnitOptions();
+    } catch (e) {
+        availableUnits = appConfig.defaultUnits;
+    }
+
+    // Обновляем бейдж заявителя в шапке
+    updateApplicantBadge();
+
+    // Добавляем 3 стартовые строки
+    addTableRow();
+    addTableRow();
+    addTableRow();
+
+    // Навешиваем слушатели событий
+    setupEventListeners();
+});
+
+/**
+ * Отображение текущего заявителя в шапке
+ */
+function updateApplicantBadge() {
+    const badge = document.getElementById("applicant-badge");
+    if (!badge) return;
+
+    if (currentUser && (currentUser.fullName || currentUser.NAME || currentUser.LAST_NAME)) {
+        const fullName = currentUser.fullName || 
+            [currentUser.LAST_NAME, currentUser.NAME, currentUser.SECOND_NAME].filter(Boolean).join(" ") || 
+            currentUser.NAME || 
+            currentUser.EMAIL || 
+            `Сотрудник ID ${currentUser.ID}`;
+
+        badge.innerHTML = `<span class="dot-online"></span> Заявитель: <strong>${escapeHtml(fullName)}</strong>`;
+        badge.title = `Заявитель: ${fullName}${currentUser.ID ? ' (ID: ' + currentUser.ID + ')' : ''}`;
+    } else if (api && api.isBx24) {
+        badge.innerHTML = `<span class="dot-online"></span> Заявитель: <strong>Текущий сотрудник</strong>`;
+        badge.title = "Текущий авторизованный сотрудник Битрикс24";
+    } else {
+        badge.innerHTML = `<span class="dot-online"></span> Заявитель: <strong>Сотрудник компании</strong>`;
+    }
+}
+
+/**
+ * Навешивание основных обработчиков событий
+ */
+function setupEventListeners() {
+    // Кнопка "+ Добавить позицию"
+    document.getElementById("btn-add-row").addEventListener("click", () => addTableRow());
+
+    // Кнопка "Очистить все"
+    document.getElementById("btn-clear-all").addEventListener("click", clearAllRows);
+
+    // Кнопка "Вставить из Excel"
+    document.getElementById("btn-paste-excel").addEventListener("click", () => openModal("modal-paste"));
+
+    // Кнопка "Применить вставку из Excel"
+    document.getElementById("btn-apply-paste").addEventListener("click", applyExcelPaste);
+
+    // Отправка формы (кнопка внизу)
+    document.getElementById("btn-submit-requests").addEventListener("click", submitProcurementRequests);
+
+    // Закрытие модальных окон
+    document.querySelectorAll(".modal-close, .modal-cancel").forEach(el => {
+        el.addEventListener("click", (e) => {
+            const modal = e.target.closest(".modal-overlay");
+            if (modal) closeModal(modal.id);
+        });
+    });
+
+    // Быстрые варианты обоснования закупки
+    document.querySelectorAll(".quick-tag").forEach(tagBtn => {
+        tagBtn.addEventListener("click", () => {
+            const tagText = tagBtn.getAttribute("data-tag");
+            const justInput = document.getElementById("common-justification");
+            if (justInput && tagText) {
+                justInput.value = tagText;
+                justInput.focus();
+            }
+        });
+    });
+
+    // Обработка глобального Ctrl+V для быстрой вставки из Excel в таблицу
+    document.addEventListener("paste", handleGlobalPaste);
+}
+
+/**
+ * Генерация HTML выпадающего списка единиц измерения
+ */
+function getUnitOptionsHtml(selectedUnit = "") {
+    const units = (availableUnits && availableUnits.length > 0) ? availableUnits : appConfig.defaultUnits;
+    let html = "";
+    units.forEach(u => {
+        const val = u.value;
+        const isSelected = (val.toLowerCase() === selectedUnit.toLowerCase()) ? "selected" : "";
+        html += `<option value="${val}" ${isSelected}>${val}</option>`;
+    });
+    return html;
+}
+
+/**
+ * Добавление новой строки в таблицу
+ */
+function addTableRow(data = {}) {
+    const tbody = document.getElementById("items-table-body");
+    const rowCount = tbody.querySelectorAll("tr").length + 1;
+
+    const tr = document.createElement("tr");
+    tr.className = "item-row";
+
+    // Хранилище прикрепленных файлов для текущей строки
+    tr._attachedFiles = Array.isArray(data.files) ? [...data.files] : [];
+
+    const defaultUnit = data.unit || (availableUnits[0] ? availableUnits[0].value : "штук");
+
+    tr.innerHTML = `
+        <td class="col-idx">${rowCount}</td>
+        <td class="col-name">
+            <input type="text" class="form-control input-name" placeholder="Например: Бумага А4 SvetoCopy" value="${escapeHtml(data.name || "")}" required>
+        </td>
+        <td class="col-unit">
+            <select class="form-control input-unit">
+                ${getUnitOptionsHtml(defaultUnit)}
+            </select>
+        </td>
+        <td class="col-qty">
+            <input type="number" class="form-control input-qty" placeholder="1" min="0.001" step="any" value="${data.quantity || 1}" required>
+        </td>
+        <td class="col-files">
+            <div class="file-upload-wrapper">
+                <label class="btn-attach" title="Прикрепить тех. спецификацию или коммерческое предложение">
+                    📎 <span class="attach-label">Прикрепить</span>
+                    <input type="file" class="input-row-files" multiple style="display:none">
+                </label>
+                <div class="row-files-list"></div>
+            </div>
+        </td>
+        <td class="col-note">
+            <input type="text" class="form-control input-note" placeholder="Ссылка или примечание" value="${escapeHtml(data.note || "")}">
+        </td>
+        <td class="col-actions">
+            <div class="row-actions">
+                <button type="button" class="btn-row-copy" title="Дублировать строку">📋</button>
+                <button type="button" class="btn-row-del" title="Удалить строку">✕</button>
+            </div>
+        </td>
+    `;
+
+    // Слушатель выбора файлов
+    const fileInput = tr.querySelector(".input-row-files");
+    const uploadWrapper = tr.querySelector(".file-upload-wrapper");
+
+    const processFiles = async (files) => {
+        for (const f of files) {
+            try {
+                const base64Data = await readFileAsBase64(f);
+                tr._attachedFiles.push({
+                    name: f.name,
+                    base64: base64Data,
+                    size: f.size
+                });
+            } catch (err) {
+                console.error("Ошибка чтения файла:", err);
+            }
+        }
+        renderRowFiles(tr);
+    };
+
+    fileInput.addEventListener("change", async (e) => {
+        const files = Array.from(e.target.files);
+        await processFiles(files);
+        fileInput.value = ""; // сброс значения
+    });
+
+    // Drag & Drop файлов прямо на ячейку
+    uploadWrapper.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadWrapper.classList.add("dragover");
+    });
+    uploadWrapper.addEventListener("dragleave", () => {
+        uploadWrapper.classList.remove("dragover");
+    });
+    uploadWrapper.addEventListener("drop", async (e) => {
+        e.preventDefault();
+        uploadWrapper.classList.remove("dragover");
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            await processFiles(Array.from(e.dataTransfer.files));
+        }
+    });
+
+    // Отрисовываем файлы, если они уже были (например, при дублировании)
+    renderRowFiles(tr);
+
+    // Слушатель удаления строки
+    tr.querySelector(".btn-row-del").addEventListener("click", () => {
+        tr.remove();
+        reindexRows();
+        updateStats();
+    });
+
+    // Слушатель дублирования строки
+    tr.querySelector(".btn-row-copy").addEventListener("click", () => {
+        const currentData = {
+            name: tr.querySelector(".input-name").value,
+            unit: tr.querySelector(".input-unit").value,
+            quantity: tr.querySelector(".input-qty").value,
+            note: tr.querySelector(".input-note").value,
+            files: [...tr._attachedFiles]
+        };
+        addTableRow(currentData);
+    });
+
+    // Слушатели пересчета
+    tr.querySelector(".input-qty").addEventListener("input", updateStats);
+    tr.querySelector(".input-name").addEventListener("input", updateStats);
+
+    tbody.appendChild(tr);
+    reindexRows();
+    updateStats();
+
+    return tr;
+}
+
+/**
+ * Отрисовка прикрепленных файлов для конкретной строки
+ */
+function renderRowFiles(tr) {
+    const filesListEl = tr.querySelector(".row-files-list");
+    const attachLabel = tr.querySelector(".attach-label");
+    if (!filesListEl || !attachLabel) return;
+
+    filesListEl.innerHTML = "";
+
+    tr._attachedFiles.forEach((f, fIdx) => {
+        const tag = document.createElement("span");
+        tag.className = "file-tag";
+        tag.title = `${f.name} (${formatFileSize(f.size)})`;
+        tag.innerHTML = `📄 ${escapeHtml(shortenFileName(f.name))} <span class="file-tag-remove" title="Удалить файл">✕</span>`;
+
+        tag.querySelector(".file-tag-remove").addEventListener("click", (evt) => {
+            evt.preventDefault();
+            evt.stopPropagation();
+            tr._attachedFiles.splice(fIdx, 1);
+            renderRowFiles(tr);
+        });
+
+        filesListEl.appendChild(tag);
+    });
+
+    const count = tr._attachedFiles.length;
+    attachLabel.textContent = count > 0 ? `Файлы (${count})` : "Прикрепить";
+}
+
+/**
+ * Чтение файла в Base64
+ */
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const res = reader.result;
+            const base64 = res.includes(",") ? res.split(",")[1] : res;
+            resolve(base64);
+        };
+        reader.onerror = err => reject(err);
+        reader.readAsDataURL(file);
+    });
+}
+
+/**
+ * Форматирование размера файла
+ */
+function formatFileSize(bytes) {
+    if (!bytes) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+}
+
+/**
+ * Сокращение имени файла для аккуратного отображения
+ */
+function shortenFileName(name, maxLen = 14) {
+    if (!name || name.length <= maxLen) return name;
+    const ext = name.includes(".") ? "." + name.split(".").pop() : "";
+    const base = name.substring(0, name.length - ext.length);
+    return base.substring(0, maxLen - ext.length - 3) + "..." + ext;
+}
+
+/**
+ * Перенумерация строк
+ */
+function reindexRows() {
+    const rows = document.querySelectorAll("#items-table-body tr");
+    rows.forEach((row, idx) => {
+        const idxCell = row.querySelector(".col-idx");
+        if (idxCell) idxCell.textContent = idx + 1;
+    });
+}
+
+/**
+ * Очистить все строки и оставить одну чистую
+ */
+function clearAllRows() {
+    if (confirm("Вы уверены, что хотите очистить все позиции?")) {
+        document.getElementById("items-table-body").innerHTML = "";
+        addTableRow();
+        updateStats();
+    }
+}
+
+/**
+ * Обновление счетчиков внизу и на тулбаре
+ */
+function updateStats() {
+    const rows = document.querySelectorAll("#items-table-body tr");
+    let filledCount = 0;
+    let totalQty = 0;
+
+    rows.forEach(r => {
+        const name = r.querySelector(".input-name").value.trim();
+        const qty = parseFloat(r.querySelector(".input-qty").value) || 0;
+        if (name) {
+            filledCount++;
+            totalQty += qty;
+        }
+    });
+
+    const btnSubmit = document.getElementById("btn-submit-requests");
+    const countDisplay = document.getElementById("total-rows-count");
+
+    if (countDisplay) {
+        countDisplay.textContent = filledCount;
+    }
+
+    if (btnSubmit) {
+        btnSubmit.innerHTML = `🚀 Отправить заявки в закуп (${filledCount} поз.)`;
+        btnSubmit.disabled = (filledCount === 0);
+    }
+}
+
+/**
+ * Обработка вставки из буфера обмена (Excel / Sheets)
+ */
+function handleGlobalPaste(e) {
+    if (e.target.id === "paste-textarea" || e.target.id === "common-justification") {
+        return;
+    }
+
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const pastedData = clipboardData.getData("Text");
+
+    if (pastedData && (pastedData.includes("\t") || pastedData.includes("\n"))) {
+        const parsed = parseTabularData(pastedData);
+        if (parsed.length > 0) {
+            e.preventDefault();
+            insertRowsFromData(parsed);
+        }
+    }
+}
+
+/**
+ * Парсер строк из Excel
+ */
+function parseTabularData(text) {
+    const lines = text.trim().split(/\r\n|\n|\r/);
+    const results = [];
+
+    lines.forEach(line => {
+        if (!line.trim()) return;
+
+        let parts = line.split("\t");
+        if (parts.length === 1 && line.includes(";")) {
+            parts = line.split(";");
+        }
+
+        const name = (parts[0] || "").trim();
+        if (!name) return;
+
+        let unit = (parts[1] || "").trim().toLowerCase();
+        let qty = parseFloat((parts[2] || "1").replace(",", ".")) || 1;
+        let note = (parts[3] || "").trim();
+
+        const unitsList = (availableUnits && availableUnits.length > 0) ? availableUnits : appConfig.defaultUnits;
+        const matchedUnit = unitsList.find(u => u.value.toLowerCase() === unit);
+
+        if (matchedUnit) {
+            unit = matchedUnit.value;
+        } else {
+            const maybeQty = parseFloat(unit.replace(",", "."));
+            if (!isNaN(maybeQty)) {
+                qty = maybeQty;
+                unit = unitsList[0].value;
+                note = (parts[2] || "").trim();
+            } else {
+                unit = unitsList[0].value;
+            }
+        }
+
+        results.push({
+            name: name,
+            unit: unit,
+            quantity: qty,
+            note: note,
+            files: []
+        });
+    });
+
+    return results;
+}
+
+/**
+ * Применение вставки из модального окна Excel
+ */
+function applyExcelPaste() {
+    const textarea = document.getElementById("paste-textarea");
+    const text = textarea.value.trim();
+    if (!text) {
+        alert("Вставьте скопированные данные из таблицы в поле ввода.");
+        return;
+    }
+
+    const parsed = parseTabularData(text);
+    if (parsed.length === 0) {
+        alert("Не удалось распознать строки. Убедитесь, что каждая строка содержит наименование.");
+        return;
+    }
+
+    insertRowsFromData(parsed);
+    textarea.value = "";
+    closeModal("modal-paste");
+}
+
+/**
+ * Вставка распознанных строк в таблицу
+ */
+function insertRowsFromData(dataList) {
+    const rows = document.querySelectorAll("#items-table-body tr");
+    rows.forEach(r => {
+        const name = r.querySelector(".input-name").value.trim();
+        if (!name) r.remove();
+    });
+
+    dataList.forEach(item => {
+        addTableRow(item);
+    });
+
+    updateStats();
+}
+
+/**
+ * Сбор данных из таблицы
+ */
+function collectTableItems() {
+    const rows = document.querySelectorAll("#items-table-body tr");
+    const items = [];
+
+    rows.forEach(r => {
+        const name = r.querySelector(".input-name").value.trim();
+        const unit = r.querySelector(".input-unit").value;
+        const qty = parseFloat(r.querySelector(".input-qty").value) || 0;
+        const note = r.querySelector(".input-note").value.trim();
+        const files = r._attachedFiles || [];
+
+        if (name && qty > 0) {
+            items.push({
+                productName: name,
+                unit: unit,
+                quantity: qty,
+                note: note,
+                files: files
+            });
+        }
+    });
+
+    return items;
+}
+
+/**
+ * Отправка заявок в смарт-процесс отдела закупа
+ */
+async function submitProcurementRequests() {
+    const items = collectTableItems();
+    if (items.length === 0) {
+        alert("Заполните хотя бы одну позицию (наименование и количество > 0).");
+        return;
+    }
+
+    // Собираем общие данные (обоснование покупки пойдет в UF_CRM_53_CAUSE)
+    const justificationEl = document.getElementById("common-justification");
+    const commonData = {
+        justification: justificationEl ? justificationEl.value.trim() : "",
+        categoryId: appConfig.categoryId || null,
+        // Заявитель (пишется в UF_CRM_53_1783939121, а ответственный остается по умолчанию)
+        applicantId: (currentUser && currentUser.ID) ? currentUser.ID : null
+    };
+
+    // Открываем модальное окно прогресса
+    openModal("modal-progress");
+    const progressFill = document.getElementById("progress-bar-fill");
+    const progressLabel = document.getElementById("progress-label-text");
+    const resultsContainer = document.getElementById("progress-results-list");
+    const btnDone = document.getElementById("btn-progress-done");
+
+    btnDone.style.display = "none";
+    resultsContainer.innerHTML = "";
+    progressFill.style.width = "0%";
+    progressLabel.textContent = `Отправка ${items.length} заявок в смарт-процесс...`;
+
+    try {
+        const results = await api.createProcurementItems(items, commonData, (completed, total) => {
+            const percent = Math.round((completed / total) * 100);
+            progressFill.style.width = `${percent}%`;
+            progressLabel.textContent = `Создано ${completed} из ${total} заявок (${percent}%)`;
+        });
+
+        // Отображение результатов
+        let successCount = 0;
+        results.forEach(res => {
+            if (res.success) successCount++;
+            const div = document.createElement("div");
+            div.className = `result-item ${res.success ? "success" : "error"}`;
+
+            if (res.success) {
+                div.innerHTML = `
+                    <div>
+                        <strong>#${res.index}</strong>: ${escapeHtml(res.productName)} (${res.quantity} ${escapeHtml(res.unit)}) — 
+                        <a href="${res.url}" target="_blank" class="result-link">Заявка #${res.id} в смарт-процессе ↗</a>
+                    </div>
+                    <span class="badge badge-success">Создано</span>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div>
+                        <strong>#${res.index}</strong>: ${escapeHtml(res.productName)} (${escapeHtml(res.error)})
+                    </div>
+                    <span class="badge badge-error">Ошибка</span>
+                `;
+            }
+            resultsContainer.appendChild(div);
+        });
+
+        progressLabel.innerHTML = `Готово! Успешно создано <strong>${successCount}</strong> из <strong>${items.length}</strong> заявок в отдел закупа.`;
+        btnDone.style.display = "inline-flex";
+
+        // Если все успешно — очищаем таблицу для новых заявок
+        if (successCount === items.length) {
+            document.getElementById("items-table-body").innerHTML = "";
+            document.getElementById("common-justification").value = "";
+            addTableRow();
+            updateStats();
+        }
+
+    } catch (err) {
+        console.error("Ошибка при создании заявок:", err);
+        progressLabel.innerHTML = `<span style="color:red">Ошибка: ${escapeHtml(err.message)}</span>`;
+        btnDone.style.display = "inline-flex";
+    }
+}
+
+/**
+ * Управление модальными окнами
+ */
+function openModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.classList.add("active");
+}
+
+function closeModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.classList.remove("active");
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+</script>
 </body>
 </html>

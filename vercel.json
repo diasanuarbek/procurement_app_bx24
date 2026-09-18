@@ -1,0 +1,9 @@
+﻿{
+  "version": 2,
+  "routes": [
+    { "src": "/install.html", "dest": "/api/index.js" },
+    { "src": "/index.html", "dest": "/api/index.js" },
+    { "src": "/", "dest": "/api/index.js" },
+    { "src": "/(.*)", "dest": "/" }
+  ]
+}
