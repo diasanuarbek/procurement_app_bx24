@@ -1,10 +1,12 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 module.exports = (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('X-Frame-Options', 'ALLOWALL');
+    res.setHeader('Content-Security-Policy', "frame-ancestors *");
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
     if (req.method === 'OPTIONS') {
